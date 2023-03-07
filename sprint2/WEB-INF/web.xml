@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
                       https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd" version="5.0" metadata-complete="true">
 
-    <display-name>FrameWork My Spring</display-name>
+    <display-name>FrameWork Servlet sprint-2</display-name>
 
     <servlet>
         <servlet-name>FrontServlet</servlet-name>
@@ -11,7 +11,11 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>FrontServlet</servlet-name>
-        <url-pattern>/frontServlet</url-pattern>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>Mapping</servlet-name>
+        <servlet-class>etu1820.framework.Mapping</servlet-class>
+    </servlet>
 </web-app>
