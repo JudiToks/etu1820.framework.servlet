@@ -2,53 +2,77 @@ package etu1820.framework.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Vector;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+
 import etu1820.framework.Mapping;
+import etu1820.framework.Utility;
 
 public class FrontServlet extends HttpServlet 
 {
-    HashMap<String,Mapping> mappingUrls; 
+    HashMap<String,Mapping> mappingUrls = new HashMap<>();
+    
+    // function init
+    public void init() throws ServletException
+    {
+        super.init();
+        try
+        {
+            Vector<String> paths = Utility.readPackage(getServletContext().getResource(".").toURI().getPath() + "WEB-INF/classes");
+            for (String path : paths)
+            {
+                Vector<Utility> utilities = Utility.readAnnotation(path);
+                for (Utility utility : utilities)
+                {
+                    mappingUrls.put(utility.getValue(), new Mapping(utility.getClassName(), utility.getMethod()));
+                }
+            }
+        }
+        catch (URISyntaxException | MalformedURLException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 
+    // method doGet
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException 
     {
-        PrintWriter out = res.getWriter();
         try 
         {
-            String clientString = processRequest(res, req);
-            out.println(clientString);
+            super.doGet(req, res);
+            processRequest(res, req);
         } 
         catch (Exception e) 
         {
-            out.println("Exception: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
+    // method doPost
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException 
     {
-        PrintWriter out = res.getWriter();
         try 
         {
-            String clientString = processRequest(res, req);
-            out.println(clientString);
+            super.doPost(req, res);
+            processRequest(res, req);
         } 
         catch (Exception e) 
         {
-            out.println("Exception: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
-    public String processRequest(HttpServletResponse res, HttpServletRequest req) throws Exception 
+    // function processRequest
+    public void processRequest(HttpServletResponse res, HttpServletRequest req) throws Exception 
     {
-        StringBuffer url = req.getRequestURL();
-        String context = req.getContextPath();
-        int index = url.indexOf(req.getContextPath());
-        String otherArgs = "";
-        for (int i = index + (context.length()) + 1; i < url.length(); i++) 
-        {
-            otherArgs += url.toString().charAt(i);
-        }
-        return otherArgs;
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+        out.println("<html><body>");
+        out.println(mappingUrls.get(req.getServletPath()).getClassName());
+        out.println("</body></html>");
     }
 }
